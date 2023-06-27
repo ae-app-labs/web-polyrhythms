@@ -6,13 +6,14 @@ let startTime = new Date().getTime()
 let soundEnabled = false
 const maxLoops = 50
 const oneFullLoop = 2 * Math.PI
-const realignmentTime = 900; // 15 minutes
+const realignmentTime = 60 * 20; // 20 minutes
 
+// Disable audio if we the tab is not visible
 document.onvisibilitychange = () => soundEnabled = false
 
 paper.onclick = () => soundEnabled = !soundEnabled
 
-const colors = [
+const colors1 = [
     "#D0E7F5",
     "#D9E7F4",
     "#D6E3F4",
@@ -36,6 +37,30 @@ const colors = [
     "#FEDCD1",
 ]
 
+const colors = [
+    "#86FBCC",
+    "#8AF3D2",
+    "#8DEDD6",
+    "#91E5DB",
+    "#95DDE1",
+    "#98D7E5",
+    "#9CCFEB",
+    "#9FC8F0",
+    "#A3C1F5",
+    "#A7B9FA",
+    "#AAB2FF",
+    "#B0B0FF",
+    "#B7AEFF",
+    "#BCADFF",
+    "#C3ABFF",
+    "#CAA9FF",
+    "#D0A8FF",
+    "#D5A6FF",
+    "#DCA4FF",
+    "#E2A3FF",
+    "#E9A1FF",
+]
+
 const calculateNextImpactTime = (currentImpactTime, velocity) => {
     return currentImpactTime + (Math.PI / velocity) * 1000
 }
@@ -55,6 +80,7 @@ const arcs = colors.map( (color, index) => {
     }
 })
 
+// the draw loop
 const draw = () => {
     paper.width = paper.clientWidth
     paper.height = paper.clientHeight
@@ -73,12 +99,12 @@ const draw = () => {
     }
 
     const center = {
-        x: paper.width *.5,
-        y: paper.height *.9
+        x: paper.width * 0.5,
+        y: paper.height * 0.9
     }
 
     // Draw the line
-    pen.strokeStyle = "white"
+    pen.strokeStyle = "#E9A1FF"
     pen.lineWidth = 6
 
     pen.beginPath()
@@ -86,22 +112,18 @@ const draw = () => {
     pen.lineTo(end.x, end.y)
     pen.stroke()
 
+    // Draw the arcs and circles
     const length = end.x - start.x
     const initialArcRadius = length * 0.05
-    
-    pen.lineWidth = 4
-
-    //const initialArcRadius = length * 0.05
     const spacing = (length / 2 - initialArcRadius) / arcs.length
+    const maxAngle = 2 * Math.PI
+    pen.lineWidth = 4
     
     arcs.forEach( (arc, index) => {
-        const maxAngle = 2 * Math.PI
-        //const numberOfLoops = oneFullLoop * (maxLoops - index)
-        //const velocity = numberOfLoops / realignmentTime
-        
         // distance =  time * speed
         const distance = Math.PI + (elapsedTime * arc.velocity)
         const modDistance = distance % maxAngle
+
         // constrain the circle between PI and 2 PI
         const adjustedDistance = modDistance >= Math.PI ? modDistance : maxAngle - modDistance
         const arcRadius = initialArcRadius + (index * spacing)
@@ -112,24 +134,23 @@ const draw = () => {
         pen.arc(center.x, center.y, arcRadius, Math.PI, 2 * Math.PI)
         pen.stroke()
 
-
+        // Calculate the x and y for the arc
         const x = center.x + arcRadius * Math.cos(adjustedDistance)
         const y = center.y + arcRadius * Math.sin(adjustedDistance)
 
         // Draw Circle
-        pen.fillStyle = "white"
+        pen.fillStyle = "#86FBCC"
         pen.beginPath()
         pen.arc(x, y, length * 0.0065, 0, 2 * Math.PI)
         pen.fill()
-
         
-        // Play audio
+        // Play an audio when the circle touches the line
         if(currentTime >= arc.nextImpactTime) {
-            if (index ===10)
-                console.log(currentTime + " " + arc.nextImpactTime)
+            // Play audio only if it is enabled
             if(soundEnabled){
                 arc.audio.play()
             }
+            // Recalculate the next impact time, time = distance / speed
             arc.nextImpactTime =  calculateNextImpactTime(arc.nextImpactTime, arc.velocity)
         }
 
@@ -138,5 +159,5 @@ const draw = () => {
     requestAnimationFrame(draw)
 }
 
+// Call draw() for the first time
 draw()
-
