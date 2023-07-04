@@ -1,0 +1,11 @@
+{
+  "name": "web-polyrhythms",
+  "version": "0.0.3",
+  "description": "Developed based on the a youtube video by Hyperplexed",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "aeapplabs",
+  "license": "ISC"
+}

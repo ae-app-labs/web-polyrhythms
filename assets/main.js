@@ -6,12 +6,17 @@ let startTime = new Date().getTime()
 let soundEnabled = false
 const maxLoops = 50
 const oneFullLoop = 2 * Math.PI
-const realignmentTime = 60 * 20; // 20 minutes
+const realignmentTime = 60 * 15; // 20 minutes
 
 // Disable audio if we the tab is not visible
-document.onvisibilitychange = () => soundEnabled = false
-
-paper.onclick = () => soundEnabled = !soundEnabled
+document.onvisibilitychange = () => {
+    soundEnabled = false
+    toggleAudioStatus()
+}
+paper.onclick = () => {
+    soundEnabled = !soundEnabled
+    toggleAudioStatus()
+}
 
 const colors1 = [
     "#D0E7F5",
@@ -61,13 +66,23 @@ const colors = [
     "#E9A1FF",
 ]
 
+const toggleAudioStatus = () => {
+    if(!soundEnabled){
+        document.querySelector("#mute").classList.remove('hidden')
+        document.querySelector("#unmute").classList.add('hidden')
+    } else {
+        document.querySelector("#mute").classList.add('hidden')
+        document.querySelector("#unmute").classList.remove('hidden')
+    }
+}
+
 const calculateNextImpactTime = (currentImpactTime, velocity) => {
     return currentImpactTime + (Math.PI / velocity) * 1000
 }
 
 const arcs = colors.map( (color, index) => {
     let audio = new Audio(`assets/audio/key-${index}.wav`)
-    audio.volume = 0.02
+    audio.volume = 0.2
 
     const numberOfLoops = oneFullLoop * (maxLoops - index)
     const velocity = numberOfLoops / realignmentTime
@@ -158,6 +173,10 @@ const draw = () => {
 
     requestAnimationFrame(draw)
 }
+
+
+// set the classes initially
+toggleAudioStatus()
 
 // Call draw() for the first time
 draw()
